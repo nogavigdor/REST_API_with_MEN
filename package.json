@@ -6,7 +6,7 @@
   "scripts": {
     "start-dev": "nodemon server.js",
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "echo 'No build step required'",
+    "build": "npm install",
     "start": "node server.js"
   },
   "keywords": [
