@@ -6,7 +6,7 @@ info:
 servers:
   - url: http://localhost:4000/api/
     description: Localhost development server
-  - url: https://rest-api-with-men.onrender.com
+  - url: https://rest-api-with-men.onrender.com/api/
     description: Remote deployment on render.com
 
 tags:
