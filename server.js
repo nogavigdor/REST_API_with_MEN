@@ -1,11 +1,23 @@
+//import dependencies
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const app = express();
+
+//swagger dependencies
+const swaggerUi = require('swagger-ui-express');
+const yaml = require('yamljs');
+
+//swagger setup
+const swaggerDefinition = yaml.load('./swagger.yaml');
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDefinition));
+
+
 const { verifyToken } = require('./validation');
 
 //import product routes
 const productRoutes = require('./routes/product');
+
 //import auth routes
 const authRoutes = require('./routes/auth');
 
