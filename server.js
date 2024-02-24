@@ -2,6 +2,7 @@ const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const app = express();
+const { verifyToken } = require('./validation');
 
 //import product routes
 const productRoutes = require('./routes/product');
@@ -32,7 +33,7 @@ mongoose.connect(
 mongoose.connection.once('open', () => console.log('Connected successfuly to MongoDB'));
 
 //post, put, delete -> CRUD
-app.use("/api/products", productRoutes);
+app.use("/api/products", verifyToken, productRoutes);
 
 //auht routes
 app.use("/api/user", authRoutes);

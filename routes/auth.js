@@ -3,7 +3,7 @@ const User = require('../models/user');
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 
-const {registerValidation, loginValidation, verifyToken} = require('../validation');
+const {registerValidation, loginValidation} = require('../validation');
 const { application } = require('express');
 
 //Registration
