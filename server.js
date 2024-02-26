@@ -13,8 +13,6 @@ const swaggerDefinition = yaml.load('./swagger.yaml');
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDefinition));
 
 
-const { verifyToken } = require('./validation');
-
 //import product routes
 const productRoutes = require('./routes/product');
 
@@ -45,7 +43,7 @@ mongoose.connect(
 mongoose.connection.once('open', () => console.log('Connected successfuly to MongoDB'));
 
 //post, put, delete -> CRUD
-app.use("/api/products", verifyToken, productRoutes);
+app.use("/api/products", productRoutes);
 
 //auht routes
 app.use("/api/user", authRoutes);
