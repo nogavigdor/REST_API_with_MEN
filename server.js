@@ -12,6 +12,37 @@ const yaml = require('yamljs');
 const swaggerDefinition = yaml.load('./swagger.yaml');
 app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDefinition));
 
+const swaggerJsdoc = require('swagger-jsdoc');
+//Extended: https://swagger.io/specification/#infoObject
+const options = {
+    definition: {
+        openapi: '3.0.0',
+        info: {
+            title: 'Products (Furnitures) API',
+            description: 'A simple API to manage products (furnitures) in a store',
+            version: '1.0.0',
+            contact: {
+                name: 'Noga Vigdor, noga.vigdor@gmail.com'
+            }
+        },
+        servers: [
+            {
+                url: 'http://localhost:4000/api'
+            },
+            {
+                url: 'https://rest-api-with-men.onrender.com'
+            }   
+        
+        ]
+    },
+    apis: ['./routes/*.js', './server.js']
+};
+
+const swaggwerDocs = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
+
+
 
 //import product routes
 const productRoutes = require('./routes/product');
