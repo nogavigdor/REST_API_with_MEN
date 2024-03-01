@@ -9,12 +9,11 @@ info:
     - **Authentication**: Authenticate users with JWT tokens to ensure secure access to protected resources.
     - **Swagger Documentation**: Explore the API endpoints, request parameters, and response schemas with interactive Swagger documentation.
 
-    Whether you're building a frontend application, integrating with third-party services, or simply exploring the capabilities of modern web APIs, the Furniture Store API offers the flexibility, reliability, and scalability you need to succeed. Get started today and unlock the potential of your furniture store!
   version: 1.0.0
 servers:
-  - url: http://localhost:4000/api/
+  - url: http://localhost:4000/api
     description: Localhost development server
-  - url: https://rest-api-with-men.onrender.com/api/
+  - url: https://rest-api-with-men.onrender.com/api
     description: Remote deployment on render.com
 
 tags:
