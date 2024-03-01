@@ -30,10 +30,10 @@ const swaggerOptions = {
         },
         servers: [
             {
-                url: 'http://localhost:4000/api'
+                url: 'http://localhost:4000/api1/welcome'
             },
             {
-                url: 'https://rest-api-with-men.onrender.com'
+                url: 'https://rest-api-with-men.onrender.com/api/welcome'
             }   
         ],
         // Merge the static definition with the dynamic options
@@ -62,7 +62,7 @@ app.use(bodyParser.json());
 
 //routes
 app.get('/api/welcome', (req, res) => {
-    res.status(200).send({message:"Welcome to the MEN RESTful API"});
+    res.status(200).send({message:"Welcome to the MEN RESTful produscts (furnitures) API!"});
 });
 
 
