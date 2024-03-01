@@ -65,7 +65,12 @@ router.put('/:id', verifyToken, (req, res)=>{
             if (!updatedProduct) {
                 return res.status(404).send({ message: `Cannot update product with id number ${id}. Maybe product was not found!` });
             }
-            res.send({ message: "Product was updated successfully.", data: updatedProduct }); // Send back the updated product data
+
+            // Construct the product link based on the base URL
+            const productLink = `${req.protocol}://${req.get('host')}/api/products/${updatedProduct._id}`;
+
+        // Send back the updated product data and its link
+            res.send({ message: "Product was updated successfully.", data: updatedProduct, link: productLink }); 
         })
         .catch(err => res.status(500).send({ message: `Error updating product with id = ${id}` }));
 });
