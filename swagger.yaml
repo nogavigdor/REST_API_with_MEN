@@ -1,12 +1,20 @@
 openapi: 3.0.0
 info:
   title: MEN RESTful API
-  description: A furnite store API built with MongoDB, Express and Node.js
+  description: A RESTful API for managing furniture products in a store. Built with MongoDB, Express, and Node.js.
+
+  Features include:
+    - **Product Management**: Create, retrieve, update, and delete furniture products with ease. Each product can be described with details such as name, description, price, availability, and categories.
+    - **User Registration**: Register new users securely.
+    - **Authentication**: Authenticate users with JWT tokens to ensure secure access to protected resources.
+    - **Swagger Documentation**: Explore the API endpoints, request parameters, and response schemas with interactive Swagger documentation.
+
+    Whether you're building a frontend application, integrating with third-party services, or simply exploring the capabilities of modern web APIs, the Furniture Store API offers the flexibility, reliability, and scalability you need to succeed. Get started today and unlock the potential of your furniture store!
   version: 1.0.0
 servers:
-  - url: http://localhost:4000/api/welcome
+  - url: http://localhost:4000/api/
     description: Localhost development server
-  - url: https://rest-api-with-men.onrender.com/api/welcome
+  - url: https://rest-api-with-men.onrender.com/api/
     description: Remote deployment on render.com
 
 tags:
