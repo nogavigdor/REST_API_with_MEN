@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
-  title: MEN REST-API
-  description: MongoDB ExpressJS NodeJS REST-API (DE Spring 2023)
+  title: MEN RESTful API
+  description: A furnite store API built with MongoDB, Express and Node.js
   version: 1.0.0
 servers:
   - url: http://localhost:4000/api/
@@ -44,6 +44,10 @@ components:
           type: number
         inStock:
           type: boolean
+        categories:
+          type: array
+          items:
+           type: string
     
     User:
       type: object
@@ -156,7 +160,7 @@ paths:
       tags:
       - Get Routes
       summary: Specific Product
-      description: Retrieves a specific Product based on it id.
+      description: Retrieves a specific Product based on its id.
       parameters:
         - in: path
           name: id
@@ -201,8 +205,29 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Product"
-
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Product was updated successfully.
+                  data:
+                    $ref: "#/components/schemas/Product"
+                  link:
+                    type: string
+                    format: uri
+                    example: "http://localhost:4000/api/products/{id}"
+        404:
+          description: Product not found
+        500:
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+               type: object
+                properties:
+                  message:
+                    type: string
+                    example: Error updating product with id = {id}
     delete:
       tags:
       - Delete Routes
