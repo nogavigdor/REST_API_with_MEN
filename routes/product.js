@@ -6,6 +6,7 @@ const { verifyToken } = require('../validation');
 
 // /api/products
 //Create product - post
+
 router.post('/', verifyToken, (req, res)=>{
     data = req.body;
 
@@ -16,15 +17,10 @@ router.post('/', verifyToken, (req, res)=>{
 
 // /api/products
 //Read all products - get
-router.get('/', (req, res)=>{
-
-    product.find()
-    .then(data => {res.send(data);}  )
-    .catch(err => {res.status(500).send({message:err.message}); });
-});
 
 // /api/products/instock
 //Read all products in stock - get
+
 router.get('/instock', (req, res)=>{
 
     product.find({inStock:true})

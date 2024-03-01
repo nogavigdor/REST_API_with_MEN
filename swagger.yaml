@@ -11,7 +11,16 @@ servers:
 
 tags:
   - name: Get Routes
-    description: Routes that get products
+    description: Routes that get furniture products
+  - name: Post Routes
+    description: Routes that create furniture products
+  - name: Put Routes
+    description: Routes that update furniture products
+  - name: Delete Routes
+    description: Routes that delete furniture products
+  - name: User Routes
+    description: Routes that handle user registration and login
+
 
 
 components:
@@ -104,36 +113,6 @@ paths:
                     type: string
 
 
-  /user/refresh:
-    post:
-      summary: Refresh the token when expired
-      description: When the access token is expired, the front-end can run this route to refresh and get a new access token (auth-token)
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              properties:
-                email:
-                  type: string
-                refreshToken:
-                  type: string
-      
-      responses:
-        200:
-          description: Access token refreshed successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  accessToken:
-                    type: string
-
-
   /products:
     get:
       tags:
@@ -151,6 +130,8 @@ paths:
                   $ref: "#/components/schemas/Product"
     
     post:
+      tags:
+      - Post Routes
       summary: Create a new Product
       description: Create a new Product
       security:
@@ -194,6 +175,8 @@ paths:
                   $ref: "#/components/schemas/Product"
    
     put:
+      tags:
+      - Put Routes
       summary: Updates a specific Product
       description: Updates a specific Product based on it id
       security:
@@ -221,6 +204,8 @@ paths:
                 $ref: "#/components/schemas/Product"
 
     delete:
+      tags:
+      - Delete Routes
       summary: Deletes a specific Product
       description: Deletes a specific Product based on it id
       security:
@@ -242,47 +227,6 @@ paths:
                 $ref: "#/components/schemas/Product"
 
 
-  /products/random:
-    get:
-      summary: Retrieves a random Product
-      description: Retrieves a random product as a JSON objects.
-      responses:
-        200:
-          description: A random product JSON object.
-          content:
-            application/json:
-              schema:
-                type: object
-                items:
-                  $ref: "#/components/schemas/Product"
-
-  /products/{field}/{value}:
-    get:
-      summary: Retrieves a liste of product based on the search filter
-      description: Retrieves a random product as a JSON objects.
-      parameters:
-        - in: path
-          name: field
-          required: true
-          description: Selected field from the document schema
-          schema:
-            type: string
-        - in: path
-          name: value
-          required: true
-          description: Selected value from the document schema
-          schema:
-            type: string
-      responses:
-        200:
-          description: A random product JSON object.
-          content:
-            application/json:
-              schema:
-                type: object
-                items:
-                  $ref: "#/components/schemas/Product"
-  
 
 
     

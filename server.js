@@ -10,11 +10,13 @@ const yaml = require('yamljs');
 
 //swagger setup
 const swaggerDefinition = yaml.load('./swagger.yaml');
-app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDefinition));
+//app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDefinition));
+
 
 const swaggerJsdoc = require('swagger-jsdoc');
 //Extended: https://swagger.io/specification/#infoObject
-const options = {
+// Define dynamic Swagger options
+const swaggerOptions = {
     definition: {
         openapi: '3.0.0',
         info: {
@@ -22,7 +24,8 @@ const options = {
             description: 'A simple API to manage products (furnitures) in a store',
             version: '1.0.0',
             contact: {
-                name: 'Noga Vigdor, noga.vigdor@gmail.com'
+                name: 'Noga Vigdor',
+                email: 'noga.vigdor@gmail.com'
             }
         },
         servers: [
@@ -32,14 +35,15 @@ const options = {
             {
                 url: 'https://rest-api-with-men.onrender.com'
             }   
-        
-        ]
+        ],
+        // Merge the static definition with the dynamic options
+        ...swaggerDefinition
     },
     apis: ['./routes/*.js', './server.js']
 };
 
-const swaggwerDocs = swaggerJsdoc(swaggerOptions);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+const swaggerDocs = swaggerJsdoc(swaggerOptions);
+app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
 
 
