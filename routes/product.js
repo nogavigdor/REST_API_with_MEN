@@ -1,29 +1,28 @@
 const router = require('express').Router();
-const product = require('../models/product');
-const { verifyToken } = require('../validation');
+const Product = require('../models/product');
+const { verifyToken, productValidation } = require('../validation');
 
 //CRUD operations
 
 // /api/products
-//Create product - post
 
-router.post('/', verifyToken, (req, res)=>{
-    data = req.body;
-
-    product.insertMany(data)
-    .then(data => {res.send(data);}  )
-    .catch(err => {res.status(500).send({message:err.message}); });
-});
 
 // /api/products
 //Read all products - get
+
+router.get('/', (req, res) => {
+    
+        Product.find()
+            .then(data => { res.send(data); })
+            .catch(err => { res.status(500).send({ message: err.message }); });
+    });
 
 // /api/products/instock
 //Read all products in stock - get
 
 router.get('/instock', (req, res)=>{
 
-    product.find({inStock:true})
+    Product.find({inStock:true})
     .then(data => {res.send(data);}  )
     .catch(err => {res.status(500).send({message:err.message}); });
 });
@@ -32,33 +31,50 @@ router.get('/instock', (req, res)=>{
 //Read specific product - get
 router.get('/:id', (req, res)=>{
 
-    product.findById(req.params.id)
+    Product.findById(req.params.id)
     .then(data => {res.send(data);}  )
     .catch(err => {res.status(500).send({message:err.message}); });
+});
+
+//Create product - post
+
+router.post('/', verifyToken, (req, res) => {
+    // Validate product data
+    const { error } = productValidation(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
+
+    // Create a new product
+    const product = new Product(req.body);
+    Product.save()
+        .then(data => res.send(data))
+        .catch(err => res.status(500).send({ message: err.message }));
 });
 
 // /api/products/:id
 //Update specific product - put
 router.put('/:id', verifyToken, (req, res)=>{
     const id = req.params.id;
-    product.findByIdAndUpdate(id, req.body)
-    .then(data => {
-        if(!data){
-            res.status(404).send({message:`Cannot update product with id number ${id}. Maybe product was not found!`});
-        }
-        else{
-            res.send({message:"Product was updated successfully."});
-        }
-        
-    }  )
-    .catch(err => {res.status(500).send({message:`Error updating product with id = ${id}`}); });
+
+    // Validate product data
+    const { error } = productValidation(req.body);
+    if (error) return res.status(400).send(error.details[0].message);
+
+    // Update the product
+    Product.findByIdAndUpdate(id, req.body, { new: true }) // Use { new: true } to return the updated document
+        .then(updatedProduct => {
+            if (!updatedProduct) {
+                return res.status(404).send({ message: `Cannot update product with id number ${id}. Maybe product was not found!` });
+            }
+            res.send({ message: "Product was updated successfully.", data: updatedProduct }); // Send back the updated product data
+        })
+        .catch(err => res.status(500).send({ message: `Error updating product with id = ${id}` }));
 });
 
 // /api/products/:id
 //Delete specific product - delete
 router.delete('/:id', verifyToken, (req, res)=>{
     const id = req.params.id;
-    product.findByIdAndDelete(id)
+    Product.findByIdAndDelete(id)
     .then(data => {
         if(!data){
             res.status(404).send({message:`Cannot delete product with id number ${id}. Maybe product was not found!`});

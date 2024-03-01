@@ -1,6 +1,19 @@
     const Joi = require('joi');
     const jwt = require('jsonwebtoken');
 
+    const productValidation = (data) => {
+        const schema = Joi.object({
+            name: Joi.string().required().max(255), // Maximum 255 characters for name
+            description: Joi.string().allow('').max(1000), // Maximum 1000 characters for description
+            price: Joi.number().required().min(0),
+            inStock: Joi.boolean().required(),
+            categories: Joi.array().items(
+                Joi.string().required().max(50) // Maximum 50 characters for each category
+            ).max(10) // Maximum 10 categories allowed
+        });
+        return schema.validate(data);
+    };
+    
     //validating registration
     const registerValidation = (data) => {
         const schema = Joi.object({
@@ -34,4 +47,4 @@
         }
     };
 
-    module.exports = { registerValidation, loginValidation, verifyToken };
+    module.exports = { registerValidation, loginValidation, verifyToken, productValidation };

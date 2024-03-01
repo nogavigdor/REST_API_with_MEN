@@ -20,6 +20,9 @@ let productSchema = new Schema({
     inStock: {
         type: Boolean
       
+    },
+    categories: {
+        type: [String] // Array of category names
     }
 });
 
