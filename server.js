@@ -30,10 +30,10 @@ const swaggerOptions = {
         },
         servers: [
             {
-                url: 'http://localhost:4000/api1/welcome'
+                url: 'http://localhost:4000/api'
             },
             {
-                url: 'https://rest-api-with-men.onrender.com/api/welcome'
+                url: 'https://rest-api-with-men.onrender.com/api'
             }   
         ],
         // Merge the static definition with the dynamic options
