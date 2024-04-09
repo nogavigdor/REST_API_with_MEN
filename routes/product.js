@@ -13,7 +13,7 @@ const { verifyToken, productValidation } = require('../validation');
 router.get('/', (req, res) => {
     
         Product.find()
-            .then(data => { res.send(data); })
+            .then(data => { res.send(mapArray(data)); })
             .catch(err => { res.status(500).send({ message: err.message }); });
     });
 
@@ -32,9 +32,30 @@ router.get('/instock', (req, res)=>{
 router.get('/:id', (req, res)=>{
 
     Product.findById(req.params.id)
-    .then(data => {res.send(data);}  )
+    .then(data => {res.send(mapData(data));}  )
     .catch(err => {res.status(500).send({message:err.message}); });
 });
+
+function mapArray(inputArray){
+    let outputArray = inputArray.map(element => mapData(element));
+    return outputArray;
+}
+
+function mapData(element){
+   let outputObj = {
+    //do some validation...
+    id: element._id,
+         name: element.name,
+      //   description: element.description,
+        //nStock: element.inStock
+        //add uri (HATEOAS) for this resource
+        uri: `http://localhost:4000/api/products/${element._id}`
+    };
+
+    return outputObj;
+   }
+   
+
 
 //Create product - post
 
