@@ -1,6 +1,4 @@
-process.env.NODE_ENV = 'test';
-//impoty the product model
-const Product = require('../models/product');
+
 // Import chai 
 const chai = require('chai');
 const expect = chai.expect;
@@ -9,27 +7,15 @@ const chaiHttp = require('chai-http');
 const server = require('../server');
 
 chai.use(chaiHttp);
-/*
-before((done) => {
-    Product.deleteMany({}, (err) => {});
-    done();
-}
-);
 
-after((done) => {
-    Product.deleteMany({}, (err) => {});
-    done();
-}
-);
-*/
-before(async () => {
-    await Product.deleteMany({});
-});
+const jwt = require('jsonwebtoken');
 
-after(async () => {
-    await Product.deleteMany({});
-});
-
+// Mock authentication function to generate token
+const generateTokenForTest = (userData) => {
+    // Generate token using a mock secret key (for testing purposes only)
+    const token = jwt.sign(userData, 'mock_secret_key', { expiresIn: '1h' }); // Change the expiresIn as needed
+    return token;
+};
 
 describe('First test collection', () => {
 
@@ -51,6 +37,57 @@ describe('First test collection', () => {
                 res.should.have.status(200);
                 res.body.should.have.a('array');
                 res.body.length.should.be.eql(0);
+                done();
+            });
+    });
+
+    it('add a valid product to the database', (done) => {
+        let product = {
+            name: 'pink lamp',
+            description: 'Descorated lamp for office use',
+            price: 120,
+            inStock: true,
+            categories: ['office', 'lamp']
+        };
+        chai.request(server)
+            .post('/api/products')
+            .send(product)
+            .end((err, res) => {
+                res.should.have.status(201);
+                res.body.should.have.property('name').eql(product.name);
+                res.body.should.have.property('description').eql(product.description);
+                res.body.should.have.property('price').eql(product.price);
+                res.body.should.have.property('inStock').eql(product.inStock);
+                res.body.should.have.property('categories').eql(product.categories);
+                done();
+            });
+    });
+
+    it('add an invalid product to the database - with a missing inStock property', (done) => {
+        let product = {
+            name: 'red lamp',
+            description: 'Tall lamp for living room',
+            price: '80',
+            categories: ['living room', 'lamp']
+        };
+        chai.request(server)
+            .post('/api/products')
+            .send(product)
+            .end((err, res) => {
+                res.should.have.status(400);
+                done();
+            });
+    }
+    
+        );
+
+    it('verify that we have 1 product in the database', (done) => {
+        chai.request(server)
+            .get('/api/products')
+            .end((err, res) => {
+                res.should.have.status(200);
+                res.body.should.have.a('array');
+                res.body.length.should.be.eql(1);
                 done();
             });
     });

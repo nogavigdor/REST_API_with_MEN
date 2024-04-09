@@ -59,7 +59,8 @@ function mapData(element){
 
 //Create product - post
 
-router.post('/', verifyToken, (req, res) => {
+//router.post('/', verifyToken, (req, res) => {
+router.post('/', (req, res) => {ru
     // Validate product data
     const { error } = productValidation(req.body);
     if (error) return res.status(400).send(error.details[0].message);
