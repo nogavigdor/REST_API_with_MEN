@@ -28,21 +28,20 @@ jobs:
       - name: NPM install, build and test
         run: |
           npm install
-          npm run
           npm test
         env:
           DBHOST: ${{ secrets.DBHOST }}
           TOKEN_SECRET: ${{ secrets.TOKEN_SECRET }}
           JWT_EXPIRES_IN: ${{ secrets.JWT_EXPIRES_IN }}
+
   deploy:
     name: deploy
     needs: [test]
     runs-on: ubuntu-latest
 
     steps:
-      -name: Deploy to production
-      -uses: johnbeynon/render-deploy-action@v0.0.8
-      -with:
-        service-id: ${{ secrets.RENDER_SERVICE_ID }}
-        api-key: ${{ secrets.RENDER_API_KEY }}
-      
+      - name: Deploy to production
+        uses: johnbeynon/render-deploy-action@v0.0.8
+        with:
+          service-id: ${{ secrets.RENDER_SERVICE_ID }}
+          api-key: ${{ secrets.RENDER_API_KEY }}
