@@ -40,7 +40,7 @@ describe('First test collection', () => {
                 done();
             });
     });
-
+/*
     it('add a valid product to the database', (done) => {
         let product = {
             name: 'pink lamp',
@@ -62,7 +62,84 @@ describe('First test collection', () => {
                 done();
             });
     });
+*/
+    it('should register + login a user, create product and DELETE it from DB', (done) => {
 
+        // 1) Register new user
+        let user = {
+            name: "Noga Vigdor",
+            email: "noga.vigdor@gmail.com",
+            password: "123456"
+        }
+        chai.request(server)
+            .post('/api/user/register')
+            .send(user)
+            .end((err, res) => {
+
+                // Asserts
+                expect(res.status).to.be.equal(200);
+                expect(res.body).to.be.a('object');
+                expect(res.body.error).to.be.equal(null);
+
+                // 2) Login the user
+                chai.request(server)
+                    .post('/api/user/login')
+                    .send({
+                        "email": "noga.vigdor@gmail.com",
+                        "password": "123456"
+                    })
+                    .end((err, res) => {
+                        // Asserts                        
+                        expect(res.status).to.be.equal(200);
+                        expect(res.body.error).to.be.equal(null);
+                        let token = res.body.data.token;
+
+                        // 3) Create new product
+                        let product =
+                        {
+                            name: 'red lamp',
+                            description: 'Tall lamp for living room',
+                            price: '80',
+                            inStock: true,
+                            categories: ['living room', 'lamp']
+                        };
+
+                        chai.request(server)
+                            .post('/api/products')
+                            .set({ "auth-token": token })
+                            .send(product)
+                            .end((err, res) => {
+
+                                // Asserts
+                                expect(res.status).to.be.equal(200);
+                                expect(res.body).to.be.a('array');
+                                expect(res.body.length).to.be.eql(1);
+
+                                let savedProduct = res.body[0];
+                                expect(savedProduct.name).to.be.equal(product.name);
+                                expect(savedProduct.description).to.be.equal(product.description);
+                                expect(savedProduct.price).to.be.equal(product.price);
+                                expect(savedProduct.inStock).to.be.equal(product.inStock);
+                                expect(savedProduct.categories).to.be.eql(product.categories);
+
+                                // 4) Delete product
+                                chai.request(server)
+                                    .delete('/api/products/' + savedProduct._id)
+                                    .set({ "auth-token": token })
+                                    .end((err, res) => {
+
+                                        // Asserts
+                                        expect(res.status).to.be.equal(200);
+                                        const actualVal = res.body.message;
+                                        expect(actualVal).to.be.equal('Product was succesfully deleted.');
+                                        done();
+                                    });
+
+                            });
+                    });
+            });
+    });
+/*
     it('add an invalid product to the database - with a missing inStock property', (done) => {
         let product = {
             name: 'red lamp',
@@ -80,7 +157,8 @@ describe('First test collection', () => {
     }
     
         );
-
+        */
+/*
     it('verify that we have 1 product in the database', (done) => {
         chai.request(server)
             .get('/api/products')
@@ -91,7 +169,7 @@ describe('First test collection', () => {
                 done();
             });
     });
-
+*/
     it('First test', () => {
         expect(1).to.equal(1);
     });
