@@ -1,4 +1,4 @@
-name: Node.JS CI/CD
+name: Node.JS CI/CD pipeline
 
 on:
   push:
@@ -8,6 +8,7 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    
     strategy:
       max-parallel: 1
       matrix:
@@ -27,11 +28,12 @@ jobs:
       - name: NPM install, build and test
         run: |
           npm install
+          npm run
           npm test
         env:
           DBHOST: ${{ secrets.DBHOST }}
           TOKEN_SECRET: ${{ secrets.TOKEN_SECRET }}
-          JWT_EXPIRES_IN: ${{ secrets.JWT_EXPIRES_IN }}S
+          JWT_EXPIRES_IN: ${{ secrets.JWT_EXPIRES_IN }}
   deploy:
     name: deploy
     needs: [test]
@@ -43,10 +45,4 @@ jobs:
       -with:
         service-id: ${{ secrets.RENDER_SERVICE_ID }}
         api-key: ${{ secrets.RENDER_API_KEY }}
-        branch: main
-        build_command: npm run build
-        start_command: npm run start
-        env:
-          DBHOST: ${{ secrets.DBHOST }}
-          TOKEN_SECRET: ${{ secrets.TOKEN_SECRET }}
-          JWT_EXPIRES_IN: ${{ secrets.JWT_EXPIRES_IN }}
+      
