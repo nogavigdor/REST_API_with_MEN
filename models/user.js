@@ -4,7 +4,7 @@ let userSchema = new Schema({
     //name
     name: {
         type: String,
-        required: true,
+        required: false,
         min: 6,
         max: 255
     },

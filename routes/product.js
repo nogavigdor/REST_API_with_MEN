@@ -10,12 +10,12 @@ const { verifyToken, productValidation } = require('../validation');
 // /api/products
 //Read all products - get
 
-router.get('/', (req, res) => {
-    
-        Product.find()
-            .then(data => { res.send(mapArray(data)); })
-            .catch(err => { res.status(500).send({ message: err.message }); });
-    });
+    router.get('/', (req, res) => {
+        
+            Product.find()
+                .then(data => { res.send(mapArray(data)); })
+                .catch(err => { res.status(500).send({ message: err.message }); });
+        });
 
 // /api/products/instock
 //Read all products in stock - get
@@ -59,17 +59,23 @@ function mapData(element){
 
 //Create product - post
 
-//router.post('/', verifyToken, (req, res) => {
-router.post('/', (req, res) => {ru
+router.post('/', verifyToken, (req, res) => {
+//router.post('/', (req, res) => {ru
     // Validate product data
     const { error } = productValidation(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
+    if (error) 
+        return res.status(400).send(error.details[0].message);
 
     // Create a new product
     const product = new Product(req.body);
-    Product.save()
-        .then(data => res.send(data))
-        .catch(err => res.status(500).send({ message: err.message }));
+    product.save()
+        .then(data => res.status(201).send(data))
+        .catch(err => 
+            res.status(500).send({ message: err.message }));
+                // res.status(500).send({ message: err.message });
+
+            
+            
 });
 
 // /api/products/:id
