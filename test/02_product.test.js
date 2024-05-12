@@ -104,7 +104,7 @@
                                 categories: ['living room', 'lamp']
                             };
 
-                            console.log('token:', token);
+                        //  console.log('token:', token);
                             chai.request(server)
                                 .post('/api/products')
                                 .set({ "auth-token": token })
