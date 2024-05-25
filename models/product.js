@@ -23,7 +23,22 @@ let productSchema = new Schema({
     },
     categories: {
         type: [String] // Array of category names
+    },
+    image: {
+        type: Buffer // Image data
+    },
+    imageType: {
+        type: String // Image type
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    updatedAt: {
+        type: Date,
+        default: Date.now
     }
+
 });
 
 module.exports = mongoose.model('product', productSchema);
