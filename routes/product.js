@@ -1,6 +1,16 @@
 const router = require('express').Router();
 const Product = require('../models/product');
+const multer = require('multer');
 const { verifyToken, productValidation } = require('../validation');
+
+const upload = multer(
+    {
+        limits: {
+            fileSize: 1 * 1024 * 1024 // 1 MB file size limit
+        },
+        storage: multer.memoryStorage(),
+    }
+)
 
 //CRUD operations
 
@@ -47,7 +57,7 @@ function mapData(element){
     id: element._id,
          name: element.name,
       //   description: element.description,
-        //nStock: element.inStock
+        //inStock: element.inStock
         //add uri (HATEOAS) for this resource
         uri: `http://localhost:4000/api/products/${element._id}`
     };
@@ -59,10 +69,14 @@ function mapData(element){
 
 //Create product - post
 
-router.post('/', verifyToken, (req, res) => {
+router.post('/', verifyToken, upload.single('image'), (req, res) => {
 //router.post('/', (req, res) => {ru
     // Validate product data
-    const { error } = productValidation(req.body);
+    const { error } = productValidation({
+        ...req.body,
+        image: req.file ? req.file.buffer : undefined,
+        imageType: req.file ? req.file.mimetype : undefined
+    });
     if (error) 
         return res.status(400).send(error.details[0].message);
 
@@ -80,15 +94,23 @@ router.post('/', verifyToken, (req, res) => {
 
 // /api/products/:id
 //Update specific product - put
-router.put('/:id', verifyToken, (req, res)=>{
+router.put('/:id', verifyToken, upload.single('image'), (req, res)=>{
     const id = req.params.id;
 
     // Validate product data
     const { error } = productValidation(req.body);
     if (error) return res.status(400).send(error.details[0].message);
 
+    //prepare update object
+    const updateData = {
+        ...req.body,
+        image: req.file ? req.file.buffer : undefined,
+        imageType: req.file ? req.file.mimetype : undefined
+    };
+    
+
     // Update the product
-    Product.findByIdAndUpdate(id, req.body, { new: true }) // Use { new: true } to return the updated document
+    Product.findByIdAndUpdate(id, updateData, { new: true }) // Use { new: true } to return the updated document
         .then(updatedProduct => {
             if (!updatedProduct) {
                 return res.status(404).send({ message: `Cannot update product with id number ${id}. Maybe product was not found!` });
