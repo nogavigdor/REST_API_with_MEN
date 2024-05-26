@@ -9,7 +9,10 @@
             inStock: Joi.boolean().required(),
             categories: Joi.array().items(
                 Joi.string().required().max(50) // Maximum 50 characters for each category
-            ).max(10) // Maximum 10 categories allowed
+            ).max(10), // Maximum 10 categories allowed
+            imageId: Joi.any().optional(), // optional imageId
+            imageType: Joi.string().optional(), // optional imageType
+            updatedAt: Joi.date().optional(), // Allow date for updatedAt
         });
         return schema.validate(data);
     };
