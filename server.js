@@ -8,7 +8,8 @@ const app = express();
 const swaggerUi = require("swagger-ui-express");
 const yaml = require("yamljs");
 const cors = require("cors");
-
+const gridfsStream = require('gridfs-stream');
+const { MongoClient } = require('mongodb');
 //require.dotenv-flow.config();
 
 //CORS npm package
@@ -60,6 +61,15 @@ const swaggerOptions = {
 
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
+
+const conn = mongoose.connection;
+let gfs;
+conn.once('open', () => {
+  gfs = gridfsStream(conn.db, mongoose.mongo);
+  gfs.collection('uploads');
+  console.log("Connected successfully to MongoDB");
+});
+
 
 //import product routes
 const productRoutes = require("./routes/product");
