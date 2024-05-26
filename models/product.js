@@ -24,11 +24,12 @@ let productSchema = new Schema({
     categories: {
         type: [String] // Array of category names
     },
-    image: {
-        type: Buffer // Image data
+    imageId: {
+        type: Schema.Types.ObjectId, // Reference to the GridFS file
+        ref: 'uploads.files'
     },
     imageType: {
-        type: String // Image type
+        type: String // MIME type of the image
     },
     createdAt: {
         type: Date,
