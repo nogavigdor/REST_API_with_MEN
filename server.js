@@ -10,7 +10,7 @@ const yaml = require("yamljs");
 const cors = require("cors");
 const gridfsStream = require('gridfs-stream');
 
-require.dotenv-flow.config();
+//require.dotenv-flow.config();
 
 //CORS npm package
 /*
@@ -70,7 +70,7 @@ const productRoutes = require("./routes/product");
 //import auth routes
 const authRoutes = require("./routes/auth");
 
-
+require("dotenv-flow").config();
 
 //parse request of content-type json
 app.use(bodyParser.json());
@@ -98,11 +98,13 @@ mongoose
     });
 
     // Start the server
+    const PORT = process.env.PORT || 4000;
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });
   })
   .catch(error => console.log("Error connecting to MongoDB: " + error));
+
 
 //post, put, delete -> CRUD
 app.use("/api/products", productRoutes);
@@ -115,11 +117,6 @@ app.use("/", (req, res) => {
   res.status(404).send({ message: "Page not found" });
 });
 
-const PORT = process.env.PORT || 4000;
 
-//start up server
-app.listen(PORT, () => {
-  console.log(`Server is running on port ${PORT}`);
-});
 
 module.exports = app;
