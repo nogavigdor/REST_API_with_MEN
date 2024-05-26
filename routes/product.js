@@ -1,16 +1,18 @@
 const router = require('express').Router();
 const Product = require('../models/product');
-const multer = require('multer');
 const { verifyToken, productValidation } = require('../validation');
+const mongoose = require('mongoose');
+const Grid = require('gridfs-stream');
+const path = require('path');
+const fs = require('fs');
 
-const upload = multer(
-    {
-        limits: {
-            fileSize: 1 * 1024 * 1024 // 1 MB file size limit
-        },
-        storage: multer.memoryStorage(),
-    }
-)
+
+let gfs;
+const conn = mongoose.connection;
+conn.once('open', () => {
+    gfs = Grid(conn.db, mongoose.mongo);
+    gfs.collection('uploads');
+});
 
 //CRUD operations
 
@@ -53,15 +55,27 @@ function mapArray(inputArray){
 
 function mapData(element){
    let outputObj = {
-    //do some validation...
-    id: element._id,
+        //do some validation...
+        id: element._id,
          name: element.name,
-      //   description: element.description,
-        //inStock: element.inStock
+         description: element.description,
+         price: element.price,
+         inStock: element.inStock,
+         categories: element.categories,
+         image: element.image,
+         imageType: element.imageType,
+         createdAt: element.createdAt,
+         updatedAt: element.updatedAt,
         //add uri (HATEOAS) for this resource
         uri: `http://localhost:4000/api/products/${element._id}`
     };
 
+     // Convert buffer to base64-encoded string
+     if (element.image) {
+        outputObj.image = element.image.toString('base64');
+        outputObj.imageType = element.imageType;
+    }
+    
     return outputObj;
    }
    
@@ -70,26 +84,62 @@ function mapData(element){
 //Create product - post
 
 router.post('/', verifyToken, upload.single('image'), (req, res) => {
-//router.post('/', (req, res) => {ru
+    console.log('Request body:', req.body);
+    console.log('Uploaded file:', req.file);
     // Validate product data
-    const { error } = productValidation({
-        ...req.body,
-        image: req.file ? req.file.buffer : undefined,
-        imageType: req.file ? req.file.mimetype : undefined
-    });
-    if (error) 
-        return res.status(400).send(error.details[0].message);
+     // Prepare the product data with file and form data
+
+      // Parse categories as an array
+      const categories = Array.isArray(req.body.categories) ? req.body.categories : [req.body.categories];
+     
+      const productData = {
+        name: req.body.name,
+        description: req.body.description,
+        price: req.body.price,
+        inStock: req.body.inStock,
+        categories: categories.filter(Boolean), // Filter out any empty values
+    };
+
+    if (req.files && req.files.image) {
+        const file = req.files.image;
+        const filename = crypto.randomBytes(16).toString('hex') + path.extname(file.name);
+    
+        const writestream = gfs.createWriteStream({
+          filename: filename,
+          content_type: file.mimetype,
+          mode: 'w',
+          metadata: {
+            originalname: file.name
+          }
+        });
+    
+        const readstream = fs.createReadStream(file.tempFilePath);
+        readstream.pipe(writestream);
+    
+        writestream.on('close', (file) => {
+          productData.imageId = file._id;
+          productData.imageType = file.contentType;
+    
+
+    // Validate product data
+    const { error } = productValidation(productData);
+    if (error) return res.status(400).send(error.details[0].message);
 
     // Create a new product
-    const product = new Product(req.body);
+    const product = new Product(productData);
     product.save()
-        .then(data => res.status(201).send(data))
-        .catch(err => 
-            res.status(500).send({ message: err.message }));
-                // res.status(500).send({ message: err.message });
+      .then(data => res.status(201).send(data))
+      .catch(err => res.status(500).send({ message: err.message }));
+  });
+} else {
+  const { error } = productValidation(productData);
+  if (error) return res.status(400).send(error.details[0].message);
 
-            
-            
+  const product = new Product(productData);
+  product.save()
+    .then(data => res.status(201).send(data))
+    .catch(err => res.status(500).send({ message: err.message }));
+}
 });
 
 // /api/products/:id
@@ -97,33 +147,64 @@ router.post('/', verifyToken, upload.single('image'), (req, res) => {
 router.put('/:id', verifyToken, upload.single('image'), (req, res)=>{
     const id = req.params.id;
 
-    // Validate product data
-    const { error } = productValidation(req.body);
-    if (error) return res.status(400).send(error.details[0].message);
-
-    //prepare update object
-    const updateData = {
-        ...req.body,
-        image: req.file ? req.file.buffer : undefined,
-        imageType: req.file ? req.file.mimetype : undefined
+     // Prepare update object
+     const updateData = {
+        name: req.body.name,
+        description: req.body.description,
+        price: req.body.price,
+        inStock: req.body.inStock,
+        categories: req.body.categories ? req.body.categories.split(',').map(item => item.trim()) : [],
+        updatedAt: Date.now()
     };
+
+    if (req.files && req.files.image) {
+        const file = req.files.image;
+        const filename = crypto.randomBytes(16).toString('hex') + path.extname(file.name);
     
-
-    // Update the product
-    Product.findByIdAndUpdate(id, updateData, { new: true }) // Use { new: true } to return the updated document
-        .then(updatedProduct => {
+        const writestream = gfs.createWriteStream({
+          filename: filename,
+          content_type: file.mimetype,
+          mode: 'w',
+          metadata: {
+            originalname: file.name
+          }
+        });
+    
+        const readstream = fs.createReadStream(file.tempFilePath);
+        readstream.pipe(writestream);
+    
+        writestream.on('close', (file) => {
+          updateData.imageId = file._id;
+          updateData.imageType = file.contentType;
+    
+          const { error } = productValidation(updateData);
+          if (error) return res.status(400).send(error.details[0].message);
+    
+          Product.findByIdAndUpdate(id, updateData, { new: true })
+            .then(updatedProduct => {
+              if (!updatedProduct) {
+                return res.status(404).send({ message: `Cannot update product with id ${id}. Maybe product was not found!` });
+              }
+              const productLink = `${req.protocol}://${req.get('host')}/api/products/${updatedProduct._id}`;
+              res.send({ message: "Product was updated successfully.", data: updatedProduct, link: productLink });
+            })
+            .catch(err => res.status(500).send({ message: `Error updating product with id = ${id}` }));
+        });
+      } else {
+        const { error } = productValidation(updateData);
+        if (error) return res.status(400).send(error.details[0].message);
+    
+        Product.findByIdAndUpdate(id, updateData, { new: true })
+          .then(updatedProduct => {
             if (!updatedProduct) {
-                return res.status(404).send({ message: `Cannot update product with id number ${id}. Maybe product was not found!` });
+              return res.status(404).send({ message: `Cannot update product with id ${id}. Maybe product was not found!` });
             }
-
-            // Construct the product link based on the base URL
             const productLink = `${req.protocol}://${req.get('host')}/api/products/${updatedProduct._id}`;
-
-        // Send back the updated product data and its link
-            res.send({ message: "Product was updated successfully.", data: updatedProduct, link: productLink }); 
-        })
-        .catch(err => res.status(500).send({ message: `Error updating product with id = ${id}` }));
-});
+            res.send({ message: "Product was updated successfully.", data: updatedProduct, link: productLink });
+          })
+          .catch(err => res.status(500).send({ message: `Error updating product with id = ${id}` }));
+      }
+    });
 
 // /api/products/:id
 //Delete specific product - delete
