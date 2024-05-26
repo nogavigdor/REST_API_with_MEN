@@ -55,6 +55,10 @@ components:
           type: array
           items:
            type: string
+        imageId:
+          type: string
+        imageType:
+          type: string
     
     User:
       type: object
@@ -150,10 +154,25 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
-              $ref: "#/components/schemas/Product"
-
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                price:
+                  type: number
+                inStock:
+                  type: boolean
+                categories:
+                  type: array
+                  items:
+                    type: string
+                image:
+                  type: string
+                  format: binary
       responses:
         201:
           description: Product created succesfully
@@ -202,10 +221,25 @@ paths:
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
-              $ref: "#/components/schemas/Product"
-
+              type: object
+              properties:
+                name:
+                  type: string
+                description:
+                  type: string
+                price:
+                  type: number
+                inStock:
+                  type: boolean
+                categories:
+                  type: array
+                  items:
+                    type: string
+                image:
+                  type: string
+                  format: binary
       responses:
         201:
           description: Product updated succesfully
