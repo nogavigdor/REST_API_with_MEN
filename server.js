@@ -9,8 +9,8 @@ const swaggerUi = require("swagger-ui-express");
 const yaml = require("yamljs");
 const cors = require("cors");
 const gridfsStream = require('gridfs-stream');
-const { MongoClient } = require('mongodb');
-//require.dotenv-flow.config();
+
+require.dotenv-flow.config();
 
 //CORS npm package
 /*
@@ -62,13 +62,6 @@ const swaggerOptions = {
 const swaggerDocs = swaggerJsdoc(swaggerOptions);
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerDocs));
 
-const conn = mongoose.connection;
-let gfs;
-conn.once('open', () => {
-  gfs = gridfsStream(conn.db, mongoose.mongo);
-  gfs.collection('uploads');
-  console.log("Connected successfully to MongoDB");
-});
 
 
 //import product routes
@@ -77,7 +70,7 @@ const productRoutes = require("./routes/product");
 //import auth routes
 const authRoutes = require("./routes/auth");
 
-require("dotenv-flow").config();
+
 
 //parse request of content-type json
 app.use(bodyParser.json());
@@ -95,11 +88,21 @@ mongoose
     //useNewUrlParser: true,
     //useUnifiedTopology: true
   })
-  .catch((error) => console.log("Error connecting to mongoDB:" + error));
+  .then(() => {
+    console.log("Connected successfully to MongoDB");
+    const conn = mongoose.connection;
+    conn.once('open', () => {
+      const gfs = gridfsStream(conn.db, mongoose.mongo);
+      gfs.collection('uploads');
+      console.log("GridFS is ready");
+    });
 
-mongoose.connection.once("open", () =>
-  console.log("Connected successfuly to MongoDB")
-);
+    // Start the server
+    app.listen(PORT, () => {
+      console.log(`Server is running on port ${PORT}`);
+    });
+  })
+  .catch(error => console.log("Error connecting to MongoDB: " + error));
 
 //post, put, delete -> CRUD
 app.use("/api/products", productRoutes);
