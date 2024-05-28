@@ -13,11 +13,13 @@ const cors = require("cors");
 //require.dotenv-flow.config();
 
 //CORS npm package
-/*
+
 app.use(cors({
- "origin":"http://localhost:5501"   
+  origin: "*", // Allow requests from any origin
+  methods: "GET,HEAD,PUT,PATCH,POST,DELETE", // Allowed methods
+  allowedHeaders: "Origin,X-Requested-With,Content-Type,Accept,Authorization" // Allowed headers
 }));
-*/
+/*
 app.use(function (req, res, next) {
   res.header("Access-Control-Allow-Origin", "*");
   res.header(
@@ -25,6 +27,8 @@ app.use(function (req, res, next) {
   );
   next();
 });
+*/
+
 app.use(bodyParser.json());
 
 //swagger setup
