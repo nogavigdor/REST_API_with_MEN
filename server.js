@@ -8,7 +8,7 @@ const app = express();
 const swaggerUi = require("swagger-ui-express");
 const yaml = require("yamljs");
 const cors = require("cors");
-const gridfsStream = require('gridfs-stream');
+
 
 //require.dotenv-flow.config();
 
@@ -26,6 +26,7 @@ app.use(function (req, res, next) {
   next();
 });
 app.use(bodyParser.json());
+
 //swagger setup
 const swaggerDefinition = yaml.load("./swagger.yaml");
 //app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(swaggerDefinition));
@@ -90,12 +91,6 @@ mongoose
   })
   .then(() => {
     console.log("Connected successfully to MongoDB");
-    const conn = mongoose.connection;
-    conn.once('open', () => {
-      const gfs = gridfsStream(conn.db, mongoose.mongo);
-      gfs.collection('uploads');
-      console.log("GridFS is ready");
-    });
 
     // Start the server
     const PORT = process.env.PORT || 4000;

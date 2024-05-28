@@ -55,10 +55,15 @@ components:
           type: array
           items:
            type: string
-        imageId:
+        imageData:
           type: string
+          format: binary
+          description: "Binary data of the image. Not directly exposed in API responses."
         imageType:
           type: string
+        imageUrl:
+          type: string
+          description: "URL to access the image directly if available."
     
     User:
       type: object
@@ -173,6 +178,7 @@ paths:
                 image:
                   type: string
                   format: binary
+                  description: "Binary image data to be stored."
       responses:
         201:
           description: Product created succesfully
@@ -180,30 +186,7 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Product"
-  
-  /products/{id}:
-    get:
-      tags:
-      - Get Routes
-      summary: Specific Product
-      description: Retrieves a specific Product based on its id.
-      parameters:
-        - in: path
-          name: id
-          required: true
-          description: MongoDB id
-          schema:
-            type: string
-      responses:
-        200:
-          description: A Product in the format of a JSON object.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Product"
-   
+
     put:
       tags:
       - Put Routes
@@ -240,6 +223,7 @@ paths:
                 image:
                   type: string
                   format: binary
+                  description: "Binary image data to replace existing image."
       responses:
         201:
           description: Product updated succesfully
@@ -291,6 +275,31 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/Product"
+  /products/{id}/image:
+    get:
+      tags:
+        - Product Routes
+      summary: Retrieve Product Image
+      description: Retrieves the image for the specified product as a binary data stream.
+      parameters:
+        - in: path
+          name: id
+          required: true
+          description: The ID of the product whose image is to be fetched.
+          schema:
+            type: string
+      responses:
+        200:
+          description: The image file in its original format.
+          content:
+            '*/*':
+              schema:
+                type: string
+                format: binary
+        404:
+          description: Image not found.
+        500:
+          description: Server error.              
 
 
 

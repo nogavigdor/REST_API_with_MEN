@@ -10,9 +10,9 @@
             categories: Joi.array().items(
                 Joi.string().required().max(50) // Maximum 50 characters for each category
             ).max(10), // Maximum 10 categories allowed
-            imageId: Joi.any().optional(), // optional imageId
-            imageType: Joi.string().optional(), // optional imageType
-            updatedAt: Joi.date().optional(), // Allow date for updatedAt
+            imageData: Joi.binary().optional(), // Optional binary data for the image
+            imageType: Joi.string().optional(), // Optional MIME type of the image
+            imageUrl: Joi.string().uri().allow('', null).optional() // Optional URL for the image
         });
         return schema.validate(data);
     };
