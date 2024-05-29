@@ -17,7 +17,7 @@ const cors = require("cors");
 app.use(cors({
   origin: "*", // Allow requests from any origin
   methods: "GET,HEAD,PUT,PATCH,POST,DELETE", // Allowed methods
-  allowedHeaders: "Origin,X-Requested-With,Content-Type,Accept,Authorization" // Allowed headers
+  allowedHeaders: "Origin,X-Requested-With,Content-Type,Accept,auth-token" // Allowed headers
 }));
 /*
 app.use(function (req, res, next) {
