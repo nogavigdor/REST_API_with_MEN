@@ -78,6 +78,8 @@ router.post('/', verifyToken, upload.single('image'), async (req, res) => {
       // Extract categories and handle them properly
     const categories = req.body.categories ? req.body.categories.split(',').map(item => item.trim()) : [];
 
+    
+    // Prepare the product data with file and form data
       const productData = {
         name: req.body.name,
         description: req.body.description,
