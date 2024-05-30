@@ -12,7 +12,8 @@
             ).max(10), // Maximum 10 categories allowed
             imageData: Joi.binary().optional(), // Optional binary data for the image
             imageType: Joi.string().optional(), // Optional MIME type of the image
-            imageUrl: Joi.string().uri().allow('', null).optional() // Optional URL for the image
+            imageUrl: Joi.string().uri().allow('', null).optional(), // Optional URL for the image
+            updatedAt: Joi.date().optional() // Optional updatedAt field
         });
         return schema.validate(data);
     };
